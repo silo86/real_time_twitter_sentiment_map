@@ -80,7 +80,7 @@ class listener(tweepy.Stream):
         if listener.keyword in text.lower():
           tweets_list.append(tweet)
           listener.tweet_counter += 1
-          print(f' tweets encontrados: {listener.tweet_counter}')
+          print(f'tweets encontrados: {listener.tweet_counter}')
           
           my_bar.progress(listener.tweet_counter * listener.progress_bar)
         return True
