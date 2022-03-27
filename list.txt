@@ -1,0 +1,2 @@
+-refactor the twitter search engine for users
+-reset the counter when the user starts a new search
