@@ -1,6 +1,6 @@
 import streamlit as st
+import os
 import pandas as pd
-#import time
 import tweepy
 from tweepy import Stream
 from tweepy import OAuthHandler
@@ -21,6 +21,12 @@ from util import cleanTxt
 init_notebook_mode(connected=True)
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
+#variables
+map_token = os.getenv('map_token')
+consumer_key = os.getenv('consumer_key')
+consumer_secret = os.getenv('consumer_secret')
+access_token = os.getenv('access_token')
+access_token_secret = os.getenv('access_token_secret')
 
 st.markdown(
     """
@@ -32,16 +38,10 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-consumer_key = 'VPvui5U6EquRPekMxl7vcRLd4'
-consumer_secret = 'lFLlhdsr4qltTmzlNfTjtHNrYkJ1nidJvpkr0lV284bEg6i3ZI'
-access_token = '2289545803-aZ3tKTWnFc9v0sDu6AjS4RMv3unLG7KalvIPhdt'
-access_token_secret = 'qxoQtbsklOGDnvieXDCdwTIaRGNYN9zdXAylNPWVHduPs'
-
 #Argentina Bounding box West -77°, South -57°, East -52°, North -20°.
 Argentina = [-73.48, -56.41, -53.53, -21.86]
-
+#load pretrained BERT model
 model = myModel()
-
 
 st.title("Tweets sentiment map 🔥")
 activities=["Usuarios","Mapa en vivo"]
@@ -61,12 +61,10 @@ if choice == "Mapa en vivo":
     tweets = pd.DataFrame()
     tweets_list = []
 
-
     if submit_button:
         st.write('obteniendo tweets')
         progress_bar = st.progress(0)
         key = key.lower()
-    #    print ('Starting')
         myStream = Listener(consumer_key,consumer_secret,access_token,access_token_secret)
         if st.button("Cancelar"):
             pass
@@ -88,7 +86,6 @@ if choice == "Mapa en vivo":
         tweets.sentiment[tweets['sentiment'] == 5] = 'P+'
     
         discrete_map = {'N+':'red','N':'orange','NEU':'yellow','P':'#90EE90','P+':'green'}
-        map_token = 'pk.eyJ1IjoicHlheG9sb3RsIiwiYSI6ImNrdzNsYTJwbjZhbmkydm10c2ZjbDFxNTYifQ.2Xmyk_We9QPLJHDalapzog'
         px.set_mapbox_access_token(map_token)
         #scatter map
         fig = px.scatter_mapbox(tweets, lat=tweets['lon'], lon=tweets['lat'],  hover_data=['lat','lon','sentiment'] ,color = tweets.sentiment,color_discrete_map=discrete_map, zoom=2, center={"lat":-34.60652, "lon":-58.43557})
@@ -157,7 +154,6 @@ else:
         st.write('opiniones')
         replies=[]
         coordinates = [-73.4154357571, -55.25, -53.628348965, -21.8323104794] #arg
-        #non_bmp_map = dict.fromkeys(range(0x10000, sys.maxunicode + 1), 0xfffd)
         for full_tweets in tweepy.Cursor(api.user_timeline,geocode = coordinates,screen_name= key,tweet_mode='extended',include_rts=False,timeout=999999).items(5):
             for tweet in tweepy.Cursor(api.search_tweets,q='to:'+ key,tweet_mode='extended',result_type='recent',timeout=999999).items(100):
                 if hasattr(tweet, 'in_reply_to_status_id_str'):

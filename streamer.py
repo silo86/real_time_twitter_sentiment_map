@@ -27,15 +27,12 @@ class Listener(tweepy.Stream):
                     self.tweets_list.append(tweet)
                     Listener.tweet_counter += 1
                     print(f' tweets encontrados: {Listener.tweet_counter}')
-                    
-                    
                     self.my_bar.progress(Listener.tweet_counter * Listener.progress_bar)
                 return True
             else:
                 print(f"Max number reached: {Listener.tweet_counter} outputs")
                 self.disconnect()
                 return self.tweets_list
-                
 
         def getTweetsByHashtag(self, stop_at_number, hashtag):
             try:
